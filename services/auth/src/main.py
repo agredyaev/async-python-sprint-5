@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from api import setup_routers
-from conf.constraits import BLACKLIST, EXEMPT_ENDPOINTS
+from conf.constraints import BLACKLIST, EXEMPT_ENDPOINTS
 from conf.exceptions import register_exception_handlers
 from conf.settings import settings
 from core.logging import CoreLogger

@@ -1,10 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
-from passlib.context import CryptContext
+from passlib.hash import bcrypt
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class UserCredentialsMixin(BaseModel):
@@ -25,14 +23,14 @@ class UserCreate(UserCredentialsMixin):
     def hash_password(cls, v: str) -> str:
         if len(v) < 8:
             raise ValidationError("Password must be at least 8 characters")
-        return pwd_context.hash(v)
+        return bcrypt.hash(v)
 
 
 class UserAuth(UserCredentialsMixin):
     """User authentication model."""
 
     def verify_password(self, hashed_password: str) -> bool:
-        return pwd_context.verify(self.password, hashed_password)
+        return bcrypt.verify(self.password, hashed_password)
 
 
 class UserResponse(BaseModel):

@@ -3,7 +3,7 @@ FROM python-base:0.1.0 AS base
 ARG USERNAME=auth
 
 # Install project dependencies
-RUN uv sync --package url_shortener --frozen
+RUN uv sync --package auth --frozen
 
 
 # Copy application code

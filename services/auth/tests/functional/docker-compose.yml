@@ -17,7 +17,7 @@ services:
 
   auth_postgres:
     <<: *default
-    image: postgres:17
+    image: postgres:17-alpine3.20
     volumes:
     - auth_pg_data:/var/lib/postgresql/data
     ports:

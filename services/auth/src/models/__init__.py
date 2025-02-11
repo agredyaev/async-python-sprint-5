@@ -1,4 +1,3 @@
-from models.url import Base, Url, UrlStats
-from models.user import User
+from models.user import Base, User
 
-__all__: list[str] = ["Base", "Url", "UrlStats", "User"]
+__all__: list[str] = ["Base", "User"]

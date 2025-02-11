@@ -27,47 +27,39 @@ def random_user_data() -> dict[str, str]:
 
 
 @pytest.mark.asyncio
-async def test_signup(client: TestClient, mocker, random_user_data) -> None:  # type: ignore[no-untyped-def]
+async def test_flow(client: TestClient, mocker, random_user_data) -> None:  # type: ignore[no-untyped-def]
     mock_client = Mock()
     mock_client.host = "127.0.0.4"
     mocker.patch("starlette.requests.Request.client", new_callable=lambda: mock_client)
 
     signup_response = client.post("/api/v1/user/signup", json=random_user_data)
     assert signup_response.is_success, "Signup failed"
-    user_name = signup_response.json()["username"]
-    assert user_name == random_user_data["username"], "Username does not match"
+    user_name = signup_response.json().get("username")
+    assert user_name == random_user_data.get("username"), "Username does not match"
 
     second_signup_response = client.post("/api/v1/user/signup", json=random_user_data)
     assert second_signup_response.status_code == 409, "Signup succeeded when it should have failed (409)"
 
+    logout_response_signup = client.post(
+        "/api/v1/user/logout", headers={"Authorization": f"Bearer {signup_response.cookies['access_token_cookie']}"}
+    )
+    assert logout_response_signup.is_success, "Logout failed"
 
-@pytest.mark.asyncio
-async def test_login(client: TestClient, mocker, random_user_data) -> None:  # type: ignore[no-untyped-def]
-    mock_client = Mock()
-    mock_client.host = "127.0.0.4"
-    mocker.patch("starlette.requests.Request.client", new_callable=lambda: mock_client)
+    access_token = logout_response_signup.cookies.get("access_token_cookie")
+    assert not access_token, "Access token not cleared"
 
     login_response = client.post("/api/v1/user/login", json=random_user_data)
     assert login_response.is_success, "Login failed"
-    user_name = login_response.json()["username"]
-    assert user_name == random_user_data["username"], "Username does not match"
-    access_token = login_response.cookies["access_token"]
+    user_name = login_response.json().get("username")
+    assert user_name == random_user_data.get("username"), "Username does not match"
+    access_token = login_response.cookies.get("access_token_cookie")
 
     assert access_token, "Access token not found"
 
-
-@pytest.mark.asyncio
-async def test_logout(client: TestClient, mocker, random_user_data) -> None:  # type: ignore[no-untyped-def]
-    mock_client = Mock()
-    mock_client.host = "127.0.0.4"
-    mocker.patch("starlette.requests.Request.client", new_callable=lambda: mock_client)
-    login_response = client.post("/api/v1/user/login", json=random_user_data)
-    assert login_response.is_success, "Login failed"
-
-    logout_response = client.post(
-        "/api/v1/user/logout", headers={"Authorization": f"Bearer {login_response.cookies['access_token']}"}
+    logout_response_login = client.post(
+        "/api/v1/user/logout", headers={"Authorization": f"Bearer {signup_response.cookies['access_token_cookie']}"}
     )
-    assert logout_response.is_success, "Logout failed"
+    assert logout_response_login.is_success, "Logout failed"
 
-    access_token = login_response.cookies["access_token"]
-    assert access_token == "", "Access token not cleared"
+    access_token = logout_response_login.cookies.get("access_token_cookie")
+    assert not access_token, "Access token not cleared"
