@@ -5,6 +5,8 @@ __pycache__/
 .idea/
 # C extensions
 *.so
+.mypy_cache/
+.ruff_cache/
 
 # Distribution / packaging
 .Python
@@ -128,7 +130,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+services/auth/.env
 .venv/
 env/
 venv/
@@ -169,6 +171,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-combined*txt
-test.py
-.temp-docker-compose.yml

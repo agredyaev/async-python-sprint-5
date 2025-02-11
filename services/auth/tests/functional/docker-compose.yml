@@ -1,0 +1,31 @@
+x-default: &default
+  networks:
+  - common
+  env_file:
+  - ../../.env
+  depends_on:
+    python_base:
+      condition: service_completed_successfully
+
+services:
+  auth_app_backend:
+    <<: *default
+    build:
+      context: ../../
+      dockerfile: tests/functional/Dockerfile
+
+
+  auth_postgres:
+    <<: *default
+    image: postgres:17
+    volumes:
+    - auth_pg_data:/var/lib/postgresql/data
+    ports:
+    - 5432:5432
+
+volumes:
+  auth_pg_data:
+
+networks:
+  common:
+    name: common
