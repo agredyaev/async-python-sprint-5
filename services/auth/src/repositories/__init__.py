@@ -7,8 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from conf.settings import settings
 from core.database.uow import AsyncUnitOfWork, UnitOfWorkProtocol
-from repositories.url import UrlRepository
-from repositories.url_stats import UrlStatsRepository
 from repositories.user import UserRepository
 
 
@@ -18,16 +16,6 @@ def get_uow() -> UnitOfWorkProtocol:
     async_engine = create_async_engine(url=settings.pg.dsn, echo=settings.pg.echo_sql_queries, future=True)
     async_session = async_sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False, autoflush=False)
     return AsyncUnitOfWork(session_factory=async_session)
-
-
-@lru_cache
-def get_url_repo(uow: Annotated[AsyncUnitOfWork, Depends(get_uow)]) -> UrlRepository:
-    return UrlRepository(uow.session_factory())
-
-
-@lru_cache
-def get_url_stats_repo(uow: Annotated[AsyncUnitOfWork, Depends(get_uow)]) -> UrlStatsRepository:
-    return UrlStatsRepository(uow.session_factory())
 
 
 @lru_cache

@@ -37,6 +37,9 @@ async def test_signup(client: TestClient, mocker, random_user_data) -> None:  # 
     user_name = signup_response.json()["username"]
     assert user_name == random_user_data["username"], "Username does not match"
 
+    second_signup_response = client.post("/api/v1/user/signup", json=random_user_data)
+    assert second_signup_response.status_code == 409, "Signup succeeded when it should have failed (409)"
+
 
 @pytest.mark.asyncio
 async def test_login(client: TestClient, mocker, random_user_data) -> None:  # type: ignore[no-untyped-def]
