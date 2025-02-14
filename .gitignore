@@ -172,3 +172,4 @@ cython_debug/
 combined*txt
 test.py
 .temp-docker-compose.yml
+task1.txt
