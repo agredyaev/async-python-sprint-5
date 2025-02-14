@@ -1,6 +1,6 @@
 FROM python-base:0.1.0 AS base
 
-ARG USERNAME=url_shortener
+ARG USERNAME=auth_test
 
 # Install project dependencies
 RUN uv sync --all-groups --all-packages --frozen

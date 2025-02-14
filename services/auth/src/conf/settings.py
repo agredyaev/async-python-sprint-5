@@ -72,8 +72,20 @@ class JWTSettings(DefaultSettings):
     authjwt_token_location: set[str] = {"cookies"}
     authjwt_cookie_csrf_protect: bool = False
     authjwt_access_token_expires: int = Field(...)
+    authjwt_refresh_token_expires: int = Field(...)
 
     model_config = SettingsConfigDict(env_prefix="JWT_")
+
+
+class RedisSettings(DefaultSettings):
+    host: str = Field(...)
+    port: int = Field(...)
+    db_number: int = Field(...)
+    user: str = Field(...)
+    password: str = Field(...)
+    dsn: str = Field(...)
+
+    model_config = SettingsConfigDict(env_prefix="REDIS_")
 
 
 class Settings(DefaultSettings):
@@ -83,6 +95,8 @@ class Settings(DefaultSettings):
     pg: PGSettings = PGSettings()
     auth: Auth = Auth()
     backoff: BackoffSettings = BackoffSettings()
+    redis: RedisSettings = RedisSettings()
+    jwt: JWTSettings = JWTSettings()
 
 
 settings = Settings()

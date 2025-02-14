@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 
 from schemas.user import UserAuth, UserCreate, UserLogoutResponse, UserResponse
 from services import UserService, get_user_service
@@ -19,5 +19,6 @@ async def login(data_in: UserAuth, service: Annotated[UserService, Depends(get_u
 
 
 @router.post("/logout", summary="Logout", description="Logout user", status_code=status.HTTP_200_OK)
-async def logout(service: Annotated[UserService, Depends(get_user_service)]) -> UserLogoutResponse:
-    return await service.logout()
+async def logout(request: Request, service: Annotated[UserService, Depends(get_user_service)]) -> UserLogoutResponse:
+    jti = request.state.jti
+    return await service.logout(jti=jti)

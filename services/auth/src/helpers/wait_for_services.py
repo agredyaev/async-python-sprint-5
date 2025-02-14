@@ -1,7 +1,7 @@
 import asyncio
 
 from conf.settings import settings
-from core.connections import PostgresConnectionChecker
+from core.connections import PostgresConnectionChecker, RedisConnectionChecker
 from core.logging.logger import CoreLogger
 from core.services.waiter import ServiceWaiter
 
@@ -15,7 +15,13 @@ async def main() -> None:
             logger=logger,
             max_time=settings.backoff.max_time,
             max_tries=settings.backoff.max_tries,
-        )
+        ),
+        ServiceWaiter(
+            checker=RedisConnectionChecker(dsn=settings.redis.dsn),
+            logger=logger,
+            max_time=settings.backoff.max_time,
+            max_tries=settings.backoff.max_tries,
+        ),
     ]
 
     await asyncio.gather(*(service.wait_for_service() for service in services))

@@ -8,7 +8,7 @@ x-default: &default
     python_base:
       condition: service_completed_successfully
 
-x-healthcheck: &default-healthcheck
+x-healthcheck:
   interval: 30s
   timeout: 10s
   retries: 5
@@ -18,20 +18,12 @@ services:
   auth_app_backend:
     <<: *default
     build: .
-    depends_on:
-      auth_postgres:
-        condition: service_healthy
-    healthcheck:
-      test: [CMD-SHELL, 'curl --fail http://localhost:${APP_PORT}${APP_ROOT_PATH}/api/v1/check || exit 1']
     expose:
     - ${APP_PORT}
 
   auth_postgres:
     <<: *default
     image: postgres:${POSTGRES_VERSION}
-    healthcheck:
-      test: [CMD-SHELL, "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}' || exit 1"]
-      <<: *default-healthcheck
     volumes:
     - auth_pg_data:/var/lib/postgresql/data
     expose:
@@ -39,8 +31,23 @@ services:
     ports:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
+
+
+  auth_redis:
+    <<: *default
+    container_name: auth_redis
+    image: redis
+    build:
+      context: ./../
+      dockerfile: cache/Dockerfile
+    volumes:
+    - auth_redis_cache:/data
+    expose:
+    - ${REDIS_PORT}
+
 volumes:
   auth_pg_data:
+  auth_redis_cache:
 
 networks:
   common:

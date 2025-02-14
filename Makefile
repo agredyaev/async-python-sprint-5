@@ -9,7 +9,7 @@ endef
 
 define temp_interg_compose_up
 	printf "include:\n- docker/docker-compose.yml\n-$(1)\n-$(2)" > $(TEST-COMPOSE-FILE) && \
-	docker compose -f $(TEST-COMPOSE-FILE) up --build
+	docker compose -f $(TEST-COMPOSE-FILE) up -d
 endef
 
 .PHONY: env

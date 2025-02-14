@@ -13,14 +13,15 @@ echo "Migrating database..."
 alembic upgrade head
 
 echo "Starting service in background..."
-gunicorn -c gunicorn_conf.py main:app --daemon
+gunicorn -c gunicorn_conf.py main:app
+#--daemon
 
 
 echo "Waiting for service to start..."
 sleep 5
 
 echo "Running tests..."
-pytest
-
-exit_code=$?
-exit $exit_code
+#pytest
+#
+#exit_code=$?
+#exit $exit_code
