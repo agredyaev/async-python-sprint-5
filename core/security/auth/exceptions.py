@@ -1,6 +1,12 @@
 from fastapi import HTTPException, status
 
 
+class AuthenticationError(Exception):
+    def __init__(self, message: str, original_exception: Exception | None = None):
+        super().__init__(message)
+        self.original_exception = original_exception
+
+
 class BlacklistError(HTTPException):
     def __init__(self) -> None:
         super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")

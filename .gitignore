@@ -169,7 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-combined*txt
 test.py
 .temp-docker-compose.yml
-task1.txt
+*.txt
+data*-*/

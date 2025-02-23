@@ -8,8 +8,8 @@ define temp_compose_up
 endef
 
 define temp_interg_compose_up
-	printf "include:\n- docker/docker-compose.yml\n-$(1)\n-$(2)" > $(TEST-COMPOSE-FILE) && \
-	docker compose -f $(TEST-COMPOSE-FILE) up -d
+	printf "include:\n- docker/docker-compose.yml\n-$(1)\n-$(2)\n-$(3)" > $(TEST-COMPOSE-FILE) && \
+	docker compose -f $(TEST-COMPOSE-FILE) up --build
 endef
 
 .PHONY: env
@@ -21,6 +21,14 @@ env:
 .PHONY: compose-up-auth-tests-func
 compose-up-auth-tests-func: env
 	$(call temp_compose_up, services/auth/tests/functional/docker-compose.yml)
+
+.PHONY: compose-up-files-tests-func
+compose-up-files-tests-func: env
+	$(call temp_interg_compose_up, services/auth/docker-compose.yml, services/nginx/docker-compose.yml, services/files/tests/functional/docker-compose.yml)
+
+.PHONY: compose-up-files
+compose-up-files: env
+	$(call temp_compose_up, services/files/docker-compose.yml)
 
 .PHONY: sync
 sync:

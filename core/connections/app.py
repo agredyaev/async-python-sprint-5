@@ -8,11 +8,13 @@ class AppConnectionChecker(BaseConnectionChecker):
 
     def __init__(self, url: str) -> None:
         self.url = url
-        self._client = None
+        self._client: httpx.AsyncClient | None = None
 
     async def client(self) -> httpx.AsyncClient:
         if not self._client:
-            self._client = httpx.AsyncClient()
+            client = httpx.AsyncClient()
+            await client.__aenter__()
+            self._client = client
         return self._client
 
     async def close(self) -> None:

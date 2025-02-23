@@ -8,7 +8,13 @@ from starlette.responses import JSONResponse
 
 from core.database.repository.redis import RedisConfig, RedisRepository, TokenKey, get_redis_client
 from core.logging.logger import CoreLogger
-from core.security.auth.exceptions import AuthJWTError, BlacklistError, InternalServerError, PermissionDeniedError
+from core.security.auth.exceptions import (
+    AuthenticationError,
+    AuthJWTError,
+    BlacklistError,
+    InternalServerError,
+    PermissionDeniedError,
+)
 from core.security.auth.ip_checker import IPChecker, NetworkConfig
 from core.security.auth.permissions import PermissionChecker
 from core.security.auth.schemas import UserId, UserTokenGenData
@@ -88,7 +94,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 request.state.jti = refresh_token_jti
                 logger.info("Current user extracted: user_id %s, jti %s", request.state.user_id, request.state.jti)
 
-            except Exception as e:
+            except AuthenticationError as e:
                 logger.exception("Failed to authenticate user", exc_info=e)
                 return self.handle_error(exc=InternalServerError())
 

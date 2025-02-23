@@ -28,6 +28,7 @@ SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 COPY pyproject.toml uv.lock ./
 COPY ./core ./core
 COPY ./services/auth/pyproject.toml ./services/auth/pyproject.toml
+COPY ./services/files/pyproject.toml ./services/files/pyproject.toml
 COPY ./docker/useradd.sh ./useradd.sh
 RUN chmod +x ./useradd.sh
 

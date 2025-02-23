@@ -28,10 +28,6 @@ services:
     - auth_pg_data:/var/lib/postgresql/data
     expose:
     - ${POSTGRES_PORT}
-    ports:
-    - ${POSTGRES_PORT}:${POSTGRES_PORT}
-
-
 
   auth_redis:
     <<: *default

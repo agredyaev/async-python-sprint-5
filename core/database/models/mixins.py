@@ -54,3 +54,13 @@ class DescriptionMixin:
     """Mixin that adds a description field to a model."""
 
     description: Mapped[STR_255] = mapped_column(nullable=True)
+
+
+class TimestampMixin(CreatedAtMixin, UpdatedAtMixin):
+    """Mixin that adds a timestamp field to a model."""
+
+
+class IsDeletedMixin(BaseMixin):
+    """Mixin that adds a is_deleted field to a model."""
+
+    is_deleted: Mapped[bool] = mapped_column(default=False, nullable=False)

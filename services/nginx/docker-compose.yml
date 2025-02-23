@@ -3,10 +3,10 @@ x-default: &default
   networks:
   - common
   depends_on:
-    python_base:
-      condition: service_completed_successfully
-    auth_app_backend:
-      condition: service_started
+  - auth_app_backend
+  - files_app_backend
+  - minio1
+  - minio2
 
 
 services:
@@ -19,6 +19,8 @@ services:
     - ./configs/config:/etc/nginx/conf.d:ro
     ports:
     - 80:80
+    - 9001:9001
+    - 9000:9000
 
 networks:
   common:
