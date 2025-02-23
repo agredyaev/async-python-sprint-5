@@ -1,0 +1,50 @@
+x-default: &default
+  restart: unless-stopped
+  networks:
+  - common
+  env_file:
+  - .env
+  depends_on:
+    python_base:
+      condition: service_completed_successfully
+
+x-healthcheck:
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 30s
+
+services:
+  auth_app_backend:
+    <<: *default
+    build: .
+    expose:
+    - ${APP_PORT}
+
+  auth_postgres:
+    <<: *default
+    image: postgres:${POSTGRES_VERSION}
+    volumes:
+    - auth_pg_data:/var/lib/postgresql/data
+    expose:
+    - ${POSTGRES_PORT}
+
+  auth_redis:
+    <<: *default
+    container_name: auth_redis
+    image: redis
+    build:
+      context: ./../
+      dockerfile: cache/Dockerfile
+    volumes:
+    - auth_redis_cache:/data
+    expose:
+    - ${REDIS_PORT}
+
+volumes:
+  auth_pg_data:
+  auth_redis_cache:
+
+networks:
+  common:
+    name: common

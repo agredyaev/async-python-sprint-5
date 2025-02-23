@@ -1,0 +1,45 @@
+x-default: &default
+  networks:
+  - common
+  env_file:
+  - ../../.env
+  depends_on:
+    python_base:
+      condition: service_completed_successfully
+
+services:
+  auth_app_backend:
+    <<: *default
+    build:
+      context: ../../
+      dockerfile: tests/functional/Dockerfile
+
+
+  auth_postgres:
+    <<: *default
+    image: postgres:17-alpine3.20
+    volumes:
+    - auth_pg_data:/var/lib/postgresql/data
+    ports:
+    - 5432:5432
+
+
+  auth_redis:
+    <<: *default
+    container_name: auth_redis
+    image: redis
+    build:
+      context: ./../../../
+      dockerfile: cache/Dockerfile
+    volumes:
+    - auth_redis_cache:/data
+    ports:
+    - 6379:6379
+
+volumes:
+  auth_pg_data:
+  auth_redis_cache:
+
+networks:
+  common:
+    name: common

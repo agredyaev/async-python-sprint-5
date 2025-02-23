@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.12', '3.13']
+
+    steps:
+      # 1. Checkout the code from the repository
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+      # 2. Rename .env.example file to .env
+    - name: Create .env file
+      run: make env
+
+      # 3. Set up the Python environment
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+      # 4. Install uv
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: latest
+
+      # 5. Install python
+    - name: Set up Python
+      run: uv python install
+
+    # 6.1 Create Virtual Environment
+    - name: Install the project
+      run: make sync
+
+    # 6.2 Activate Virtual Environment
+    - name: Activate Virtual Environment
+      run: source .venv/bin/activate
+
+    # 6.3 Add Virtual Environment to PATH
+    - name: Add Virtual Environment to PATH
+      run: echo "${{ github.workspace }}/.venv/bin" >> $GITHUB_PATH
+
+    # 7.1 Install missing stub packages
+    - name: Install missing type third-party stubs
+      run: |
+        uv pip install types-requests
+
+      # 7.2 Install missing stub packages
+    - name: Install missing type stubs
+      run: |
+        uv run mypy --install-types --non-interactive .
+
+      # 8. Run Ruff Linter and show all errors
+    - name: Run Ruff Linter
+      run: |
+        uv run ruff check --output-format=github --config=pyproject.toml .
+
+      # 9. Run Mypy Type Checking and show all errors
+    - name: Run Mypy Type Checking
+      run: |
+        uv run mypy --config-file=pyproject.toml .
+
+#      # 10. Run Pytest
+#    - name: Run Pytest with conditional migrations
+#      run: |
+#        if [ -f "alembic.ini" ]; then
+#          make migrate-test
+#        else
+#          make test
+#        fi

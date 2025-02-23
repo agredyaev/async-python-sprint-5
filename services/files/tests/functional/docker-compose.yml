@@ -1,0 +1,74 @@
+x-default: &default
+  networks:
+  - common
+  env_file:
+  - ../../.env
+  depends_on:
+    python_base:
+      condition: service_completed_successfully
+
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2025-02-07T23-21-09Z
+  command: server --console-address ":9001" http://minio{1...2}/data{1...2}
+  expose:
+  - 9000
+  - 9001
+  networks:
+  - common
+  env_file:
+  - ../../.env
+
+services:
+  files_app_backend:
+    <<: *default
+    build:
+      context: ../../
+      dockerfile: tests/functional/Dockerfile
+    ports:
+    - 8076:8076
+
+  files_postgres:
+    <<: *default
+    image: postgres:17-alpine3.20
+    volumes:
+    - files_pg_data:/var/lib/postgresql/data
+    ports:
+    - 5432:5432
+
+  files_redis:
+    <<: *default
+    container_name: files_redis
+    image: redis
+    build:
+      context: ./../../../
+      dockerfile: cache/Dockerfile
+    volumes:
+    - files_redis_cache:/data
+    expose:
+    - 6379
+
+  minio1:
+    <<: *minio-common
+    hostname: minio1
+    volumes:
+    - ./data1-1:/data1
+    - ./data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    hostname: minio2
+    volumes:
+    - ./data2-1:/data1
+    - ./data2-2:/data2
+
+volumes:
+  files_pg_data:
+  files_redis_cache:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+
+networks:
+  common:
+    name: common

@@ -1,0 +1,5 @@
+include:
+- docker/docker-compose.yml
+- services/nginx/docker-compose.yml
+- services/auth/docker-compose.yml
+- services/files/docker-compose.yml
